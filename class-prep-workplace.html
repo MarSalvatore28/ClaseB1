@@ -570,15 +570,15 @@
     <div style="display:flex;flex-direction:column;gap:12px">
       <div>
         <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.07em;color:var(--muted);margin-bottom:6px">SITUATION A — A stranger offers to help you:</div>
-        <input class="task-input" placeholder="I would say: ..." />
+        <input class="task-input" id="wu1" placeholder="I would say: ..." />
       </div>
       <div>
         <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.07em;color:var(--muted);margin-bottom:6px">SITUATION B — Your close friend offers to help you:</div>
-        <input class="task-input" placeholder="I would say: ..." />
+        <input class="task-input" id="wu2" placeholder="I would say: ..." />
       </div>
       <div>
         <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.07em;color:var(--muted);margin-bottom:6px">Why are your answers different? (write in English or Spanish)</div>
-        <textarea class="task-input" rows="2" style="resize:vertical" placeholder="Because..."></textarea>
+        <textarea class="task-input" id="wu3" rows="2" style="resize:vertical" placeholder="Because..."></textarea>
       </div>
     </div>
   </div>
@@ -682,22 +682,22 @@
     <div class="task-box" style="border:none;padding:0;background:transparent;margin-bottom:14px">
       <div class="task-label">Question 1</div>
       <p>In Dialogue 1, the tourist accepts the first two offers. What expressions does she use?</p>
-      <input class="task-input" placeholder="She says: ..." />
+      <input class="task-input" id="l1" placeholder="She says: ..." />
     </div>
     <div class="task-box" style="border:none;padding:0;background:transparent;margin-bottom:14px">
       <div class="task-label">Question 2</div>
       <p>In Dialogue 1, what does the tourist reject? What does she say?</p>
-      <input class="task-input" placeholder="She rejects the offer of... She says: ..." />
+      <input class="task-input" id="l2" placeholder="She rejects the offer of... She says: ..." />
     </div>
     <div class="task-box" style="border:none;padding:0;background:transparent;margin-bottom:14px">
       <div class="task-label">Question 3</div>
       <p>In Dialogue 2, why does the tourist use a short expression to reject the camera bag offer?</p>
-      <textarea class="task-input" rows="2" style="resize:vertical" placeholder="Because..."></textarea>
+      <textarea class="task-input" id="l3" rows="2" style="resize:vertical" placeholder="Because..."></textarea>
     </div>
     <div class="task-box" style="border:none;padding:0;background:transparent">
       <div class="task-label">Question 4 — Reflection</div>
       <p>Find one example of a <strong>tone-dependent</strong> refusal in the dialogues. How do you think it sounds?</p>
-      <input class="task-input" placeholder="The expression is... I think it sounds..." />
+      <input class="task-input" id="l4" placeholder="The expression is... I think it sounds..." />
     </div>
   </div>
 
@@ -1404,9 +1404,27 @@ async function submitToTeacher() {
   btn.innerText = "Sending...";
   btn.disabled = true;
   
+
+  let quizDetails = [];
+  document.querySelectorAll('.quiz-item').forEach((item, index) => {
+    let isCorrect = item.classList.contains('correct');
+    let isWrong = item.classList.contains('wrong');
+    let status = isCorrect ? '✅ Correct' : (isWrong ? '❌ Wrong' : '⚪ Blank');
+    quizDetails.push(`Q${index+1}: ${status}`);
+  });
+
   const data = {
     name: name,
-    quizScore: document.getElementById('scoreNum') ? document.getElementById('scoreNum').innerText.split('/')[0] : '0',
+    wu1: document.getElementById('wu1') ? document.getElementById('wu1').value : '',
+    wu2: document.getElementById('wu2') ? document.getElementById('wu2').value : '',
+    wu3: document.getElementById('wu3') ? document.getElementById('wu3').value : '',
+    l1: document.getElementById('l1') ? document.getElementById('l1').value : '',
+    l2: document.getElementById('l2') ? document.getElementById('l2').value : '',
+    l3: document.getElementById('l3') ? document.getElementById('l3').value : '',
+    l4: document.getElementById('l4') ? document.getElementById('l4').value : '',
+    quizScore: document.getElementById('scoreNum') ? document.getElementById('scoreNum').innerText : '0/5',
+    quizDetails: quizDetails.join(' | '),
+    sortResult: document.getElementById('sortFeedback') ? document.getElementById('sortFeedback').innerText : '',
     w1: document.getElementById('w1') ? document.getElementById('w1').value : '',
     w1r: document.getElementById('w1r') ? document.getElementById('w1r').value : '',
     w2: document.getElementById('w2') ? document.getElementById('w2').value : '',

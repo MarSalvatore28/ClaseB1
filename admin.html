@@ -68,6 +68,36 @@
 <div id="dashboard">
   <h1 id="panelTitle">👩‍🏫 Panel de Resultados</h1>
   <button class="btn" onclick="fetchData()" style="margin-bottom:30px;background:var(--teal);color:white">↻ Actualizar Respuestas</button>
+<button class="btn" onclick="toggleAnswers()" style="background:#2C3E50;color:white;margin-bottom:30px;margin-left:10px">📄 Ver Respuestas Correctas</button>
+
+<div id="answerKey" style="display:none;background:var(--white);border:1.5px solid #DDD5C4;border-radius:16px;padding:30px;margin-bottom:30px;">
+  <h2 style="font-family:'Syne',sans-serif;color:var(--amber);margin-top:0">✅ Answer Key (Guía para la Profesora)</h2>
+  <div class="answer-block">
+    <div class="answer-label">WARM-UP</div>
+    <div class="answer-text"><strong>Situation A (Manager):</strong> Algo formal como "That would be wonderful, thank you."<br><strong>Situation B (Coworker):</strong> Algo casual como "Sure, thanks!"<br><strong>Why:</strong> Por la diferencia de jerarquía/confianza y la dificultad de la tarea.</div>
+  </div>
+  <div class="answer-block">
+    <div class="answer-label">LISTENING</div>
+    <div class="answer-text">
+      <strong>Q1:</strong> "That would be wonderful, thank you so much!" & "I'd really appreciate that, thank you."<br>
+      <strong>Q2:</strong> Rejects formatting the presentation slides. Says: "No thanks, I'm good!"<br>
+      <strong>Q3:</strong> Because getting coffee is a simple task and they are coworkers (informal).<br>
+      <strong>Q4:</strong> "Thank you so much, but I think I can manage". Sounds polite but firm/serious.
+    </div>
+  </div>
+  <div class="answer-block">
+    <div class="answer-label">QUIZ & SORTING</div>
+    <div class="answer-text">El sistema califica automáticamente (5/5). El sorting también debe decir "Perfect!".</div>
+  </div>
+</div>
+
+<script>
+function toggleAnswers() {
+  const el = document.getElementById('answerKey');
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+</script>
+
   <div id="studentsContainer"></div>
 </div>
 
@@ -115,8 +145,31 @@
           <div class="date">Enviado: ${dateStr}</div>
           
           <div class="answer-block">
-            <div class="answer-label">Quiz Score</div>
-            <div class="answer-text"><strong>${student.quizScore || '0'}/5</strong></div>
+            <div class="answer-label">1. WARM-UP</div>
+            <div class="answer-text" style="background:#FFF0D0">
+              <strong>Sit A:</strong> ${student.wu1 || '<em>No respondió</em>'}<br>
+              <strong>Sit B:</strong> ${student.wu2 || '<em>No respondió</em>'}<br>
+              <strong>Why:</strong> ${student.wu3 || '<em>No respondió</em>'}
+            </div>
+          </div>
+          
+          <div class="answer-block">
+            <div class="answer-label">2. LISTENING COMPREHENSION</div>
+            <div class="answer-text" style="background:#D4F0EB">
+              <strong>Q1:</strong> ${student.l1 || '<em>No respondió</em>'}<br>
+              <strong>Q2:</strong> ${student.l2 || '<em>No respondió</em>'}<br>
+              <strong>Q3:</strong> ${student.l3 || '<em>No respondió</em>'}<br>
+              <strong>Q4:</strong> ${student.l4 || '<em>No respondió</em>'}
+            </div>
+          </div>
+
+          <div class="answer-block">
+            <div class="answer-label">3. QUIZ & SORT IT OUT</div>
+            <div class="answer-text">
+              <strong>Quiz Score:</strong> ${student.quizScore || '0/5'}<br>
+              <small style="color:#7f8c8d">${student.quizDetails || 'Sin detalles'}</small><br><br>
+              <strong>Sort Activity:</strong> ${student.sortResult || '<em>El estudiante no presionó "Check my answers"</em>'}
+            </div>
           </div>
           
           <div class="answer-block">
