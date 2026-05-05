@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Class Prep · Accepting & Rejecting Offers · B1-1</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Lora:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0f1420;
+    --paper: #f5f0e8;
+    --amber: #E8920A;
+    --amber-light: #FFF0D0;
+    --teal: #0D8C7A;
+    --teal-light: #D4F0EB;
+    --rose: #C0392B;
+    --rose-light: #FDECEA;
+    --slate: #2C3E50;
+    --muted: #7f8c8d;
+    --border: #DDD5C4;
+    --white: #FEFDFB;
+  }
+
+  * { margin:0;padding:0;box-sizing:border-box; }
+
+  body {
+    font-family: 'Lora', Georgia, serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    background: var(--ink);
+    position: relative; overflow: hidden;
+    padding: 0;
+  }
+
+  .hero-noise {
+    position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: .4; pointer-events: none;
+  }
+
+  .hero-accent {
+    position: absolute; right: -60px; top: -60px;
+    width: 380px; height: 380px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(232,146,10,.25) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-accent2 {
+    position: absolute; left: 10%; bottom: -80px;
+    width: 220px; height: 220px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(13,140,122,.2) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-inner {
+    position: relative; z-index: 2;
+    max-width: 900px; margin: 0 auto;
+    padding: 60px 32px 52px;
+    display: grid; grid-template-columns: 1fr auto;
+    gap: 32px; align-items: center;
+  }
+
+  .hero-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: .14em; color: var(--amber);
+    text-transform: uppercase; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .hero-label::before {
+    content: ''; display: block;
+    width: 28px; height: 2px; background: var(--amber);
+  }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(30px, 5vw, 50px);
+    font-weight: 800; color: #fff;
+    line-height: 1.05; margin-bottom: 16px;
+  }
+  .hero h1 em { color: var(--amber); font-style: normal; }
+
+  .hero-desc {
+    font-size: 15px; color: rgba(255,255,255,.6);
+    line-height: 1.8; max-width: 480px;
+  }
+
+  .hero-badge {
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 20px; padding: 24px 28px;
+    text-align: center; flex-shrink: 0;
+  }
+  .hero-badge .big-emoji { font-size: 52px; display: block; margin-bottom: 10px; }
+  .hero-badge p { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; color: rgba(255,255,255,.7); letter-spacing: .06em; }
+
+  /* ─── PROGRESS BAR ─── */
+  .progress-strip {
+    background: var(--slate);
+    padding: 0 32px;
+  }
+  .progress-inner {
+    max-width: 900px; margin: 0 auto;
+    display: flex; overflow-x: auto; gap: 0;
+    scrollbar-width: none;
+  }
+  .progress-inner::-webkit-scrollbar { display: none; }
+
+  .prog-step {
+    flex-shrink: 0; padding: 14px 18px;
+    font-family: 'Syne', sans-serif;
+    font-size: 11px; font-weight: 700; letter-spacing: .05em;
+    color: rgba(255,255,255,.35);
+    border-bottom: 3px solid transparent;
+    cursor: pointer; transition: all .2s;
+    white-space: nowrap; background: none;
+    border-top: none; border-left: none; border-right: none;
+  }
+  .prog-step:hover { color: rgba(255,255,255,.7); }
+  .prog-step.active { color: var(--amber); border-bottom-color: var(--amber); }
+  .prog-step.done { color: var(--teal); }
+
+  /* ─── MAIN ─── */
+  main {
+    max-width: 900px; margin: 0 auto;
+    padding: 52px 24px 80px;
+  }
+
+  section { display: none; animation: appear .45s ease both; }
+  section.visible { display: block; }
+
+  @keyframes appear {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── SECTION TITLE ─── */
+  .sec-title {
+    display: flex; align-items: center; gap: 16px; margin-bottom: 36px;
+  }
+  .sec-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: .12em;
+    padding: 5px 12px; border-radius: 4px;
+    font-weight: 700; text-transform: uppercase;
+  }
+  .sec-title h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px; font-weight: 800;
+  }
+
+  /* ─── CARDS ─── */
+  .card {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 30px;
+    margin-bottom: 18px;
+  }
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px; font-weight: 700;
+    letter-spacing: .06em; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  /* ─── AUDIO PLAYER ─── */
+  .audio-player {
+    background: var(--ink);
+    border-radius: 20px; padding: 28px 30px;
+    color: #fff; margin-bottom: 20px;
+    position: relative; overflow: hidden;
+  }
+  .audio-player::before {
+    content: ''; position: absolute; right: -40px; top: -40px;
+    width: 180px; height: 180px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(232,146,10,.2), transparent 70%);
+  }
+
+  .player-header {
+    display: flex; align-items: flex-start;
+    justify-content: space-between; margin-bottom: 20px;
+    position: relative; z-index: 1;
+  }
+  .dialogue-info h3 {
+    font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .dialogue-info p { font-size: 13px; color: rgba(255,255,255,.55); }
+
+  .play-area {
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 20px; position: relative; z-index: 1;
+  }
+
+  .play-btn {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--amber); border: none;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all .2s; flex-shrink: 0;
+    font-size: 20px;
+  }
+  .play-btn:hover { background: #d4820a; transform: scale(1.06); }
+  .play-btn.playing { background: var(--teal); }
+
+  .progress-track {
+    flex: 1; height: 6px;
+    background: rgba(255,255,255,.15);
+    border-radius: 3px; cursor: pointer;
+    position: relative;
+  }
+  .progress-fill {
+    height: 100%; border-radius: 3px;
+    background: var(--amber); width: 0%;
+    transition: width .1s linear;
+  }
+  .time-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: rgba(255,255,255,.5);
+    flex-shrink: 0;
+  }
+
+  .speed-controls {
+    display: flex; gap: 8px; position: relative; z-index: 1;
+  }
+  .speed-btn {
+    padding: 5px 12px; border-radius: 6px;
+    border: 1.5px solid rgba(255,255,255,.2);
+    background: transparent; color: rgba(255,255,255,.5);
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    cursor: pointer; transition: all .2s;
+  }
+  .speed-btn:hover, .speed-btn.active { background: rgba(255,255,255,.1); color: #fff; border-color: rgba(255,255,255,.4); }
+  .speed-btn.active { border-color: var(--amber); color: var(--amber); }
+
+  .dialogue-parts {
+    background: rgba(255,255,255,.05);
+    border-radius: 12px; padding: 4px;
+    display: flex; gap: 4px; margin-left: auto;
+  }
+  .part-btn {
+    padding: 6px 14px; border-radius: 9px;
+    border: none; background: transparent;
+    font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700;
+    color: rgba(255,255,255,.4); cursor: pointer; transition: all .2s;
+  }
+  .part-btn.active { background: var(--amber); color: var(--ink); }
+
+  /* ─── TRANSCRIPT ─── */
+  .transcript {
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 16px; padding: 24px 26px;
+    margin-bottom: 20px; display: none;
+  }
+  .transcript.show { display: block; animation: appear .3s ease both; }
+  .transcript-toggle {
+    background: none; border: 1.5px solid var(--border);
+    border-radius: 8px; padding: 8px 18px;
+    font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700;
+    cursor: pointer; color: var(--muted); transition: all .2s; margin-bottom: 14px;
+  }
+  .transcript-toggle:hover { border-color: var(--amber); color: var(--amber); }
+
+  .line { display: flex; gap: 14px; margin-bottom: 14px; align-items: flex-start; }
+  .speaker-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: .1em; font-weight: 700;
+    padding: 3px 10px; border-radius: 4px; flex-shrink: 0; margin-top: 3px;
+  }
+  .sp-a { background: var(--amber-light); color: #8B5700; }
+  .sp-b { background: var(--teal-light); color: #075A4E; }
+  .line-text { font-size: 15px; line-height: 1.7; }
+  .highlight { background: rgba(232,146,10,.15); border-radius: 4px; padding: 1px 4px; font-weight: 500; }
+
+  /* ─── TASKS ─── */
+  .task-box {
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 16px; padding: 24px 26px; margin-bottom: 14px;
+  }
+  .task-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: .12em;
+    color: var(--muted); margin-bottom: 12px; text-transform: uppercase;
+  }
+  .task-box p { font-size: 15px; margin-bottom: 14px; line-height: 1.7; }
+
+  .task-input {
+    width: 100%; background: var(--paper);
+    border: 1.5px solid var(--border);
+    border-radius: 10px; padding: 12px 16px;
+    font-family: 'Lora', serif; font-size: 15px;
+    color: var(--ink); outline: none;
+    transition: border-color .2s;
+  }
+  .task-input:focus { border-color: var(--amber); background: var(--white); }
+
+  /* ─── GRAMMAR CHART ─── */
+  .chart-wrap {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 16px; margin-bottom: 20px;
+  }
+  @media (max-width:580px) { .chart-wrap { grid-template-columns: 1fr; } }
+
+  .chart-col { border-radius: 16px; overflow: hidden; }
+  .chart-header {
+    padding: 14px 20px;
+    font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700;
+    letter-spacing: .04em;
+  }
+  .chart-header.accept { background: var(--teal); color: #fff; }
+  .chart-header.reject { background: var(--rose); color: #fff; }
+
+  .chart-subgroup { margin-bottom: 0; }
+  .chart-sub-label {
+    padding: 10px 18px;
+    font-family: 'Syne', sans-serif; font-size: 10px; font-weight: 700;
+    letter-spacing: .08em; text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+  .chart-sub-label.formal { background: rgba(13,140,122,.08); color: var(--teal); }
+  .chart-sub-label.informal { background: rgba(13,140,122,.04); color: var(--teal); }
+  .chart-sub-label.rformal { background: rgba(192,57,43,.08); color: var(--rose); }
+  .chart-sub-label.rinformal { background: rgba(192,57,43,.04); color: var(--rose); }
+
+  .expr-list { list-style: none; background: var(--white); border: 1.5px solid var(--border); border-top: none; }
+  .expr-item {
+    padding: 11px 18px; font-size: 14px; line-height: 1.5;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer; transition: background .15s;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .expr-item:last-child { border-bottom: none; }
+  .expr-item:hover { background: var(--paper); }
+  .expr-item .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .expr-item.used { font-weight: 600; }
+  .accept-formal .dot { background: var(--teal); }
+  .accept-informal .dot { background: #58C9B8; }
+  .reject-formal .dot { background: var(--rose); }
+  .reject-informal .dot { background: #E87C73; }
+
+  /* ─── THEORY BOX ─── */
+  .theory {
+    background: var(--ink); color: #fff;
+    border-radius: 16px; padding: 28px 30px; margin-bottom: 20px;
+  }
+  .theory h3 {
+    font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700;
+    color: var(--amber); margin-bottom: 14px; letter-spacing: .06em;
+  }
+  .theory p { font-size: 15px; line-height: 1.8; color: rgba(255,255,255,.8); }
+  .theory em { color: var(--amber); font-style: italic; }
+  .theory .rule {
+    background: rgba(255,255,255,.06); border-left: 3px solid var(--amber);
+    border-radius: 0 8px 8px 0; padding: 12px 16px;
+    margin-top: 14px; font-size: 14px; color: rgba(255,255,255,.85);
+    line-height: 1.7;
+  }
+
+  /* ─── QUIZ ─── */
+  .quiz-item {
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 16px; padding: 26px 28px; margin-bottom: 16px;
+    transition: all .2s;
+  }
+  .quiz-item.correct { border-color: var(--teal); background: var(--teal-light); }
+  .quiz-item.wrong { border-color: var(--rose); background: var(--rose-light); }
+
+  .quiz-scenario {
+    font-size: 14px; color: var(--muted); margin-bottom: 10px;
+    font-style: italic; font-family: 'Lora', serif;
+  }
+  .quiz-q { font-size: 16px; font-weight: 500; margin-bottom: 18px; line-height: 1.6; }
+
+  .quiz-opts { display: flex; flex-direction: column; gap: 10px; }
+  .quiz-opt {
+    padding: 12px 18px; border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: var(--paper); font-family: 'Lora', serif;
+    font-size: 14px; cursor: pointer; transition: all .2s;
+    text-align: left;
+  }
+  .quiz-opt:hover { border-color: var(--amber); background: var(--amber-light); }
+  .quiz-opt.correct-ans { background: var(--teal-light); border-color: var(--teal); font-weight: 600; color: #075A4E; }
+  .quiz-opt.wrong-ans { background: var(--rose-light); border-color: var(--rose); color: var(--rose); }
+
+  .quiz-explain {
+    margin-top: 14px; padding: 12px 16px;
+    border-radius: 10px; font-size: 14px; line-height: 1.7;
+    display: none;
+  }
+  .quiz-explain.show { display: block; animation: appear .3s ease both; }
+  .quiz-explain.ok { background: var(--teal-light); color: #075A4E; border-left: 4px solid var(--teal); }
+  .quiz-explain.bad { background: var(--rose-light); color: var(--rose); border-left: 4px solid var(--rose); }
+
+  /* ─── SORT ACTIVITY ─── */
+  .sort-wrap {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 16px; margin-bottom: 20px;
+  }
+  @media (max-width:580px) { .sort-wrap { grid-template-columns: 1fr; } }
+
+  .sort-bank {
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 16px; padding: 20px;
+  }
+  .sort-bank h4 {
+    font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700;
+    letter-spacing: .06em; margin-bottom: 14px; color: var(--muted);
+  }
+  .sort-items { display: flex; flex-direction: column; gap: 8px; }
+  .sort-chip {
+    padding: 10px 14px; background: var(--paper);
+    border: 1.5px solid var(--border); border-radius: 10px;
+    font-size: 14px; cursor: pointer; transition: all .2s;
+    user-select: none;
+  }
+  .sort-chip:hover { border-color: var(--amber); background: var(--amber-light); }
+  .sort-chip.dragging { opacity: .4; }
+  .sort-chip.placed { opacity: .35; pointer-events: none; }
+
+  .sort-zone {
+    min-height: 80px; background: rgba(0,0,0,.03);
+    border: 2px dashed var(--border); border-radius: 10px;
+    padding: 10px; margin-top: 10px;
+    display: flex; flex-direction: column; gap: 6px;
+    transition: border-color .2s;
+  }
+  .sort-zone.drag-over { border-color: var(--amber); background: var(--amber-light); }
+  .sort-placed {
+    padding: 9px 14px; border-radius: 8px;
+    font-size: 13px; display: flex; align-items: center;
+    justify-content: space-between; gap: 8px;
+  }
+  .sort-placed .remove-btn {
+    background: none; border: none; cursor: pointer;
+    font-size: 14px; opacity: .5; transition: opacity .2s;
+  }
+  .sort-placed .remove-btn:hover { opacity: 1; }
+  .accept-placed { background: var(--teal-light); color: #075A4E; }
+  .reject-placed { background: var(--rose-light); color: var(--rose); }
+
+  /* ─── WRITING ─── */
+  .writing-scenario {
+    background: var(--amber-light); border: 1.5px solid rgba(232,146,10,.3);
+    border-radius: 14px; padding: 18px 22px; margin-bottom: 14px;
+  }
+  .writing-scenario .scenario-label {
+    font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700;
+    letter-spacing: .08em; color: #8B5700; margin-bottom: 6px;
+  }
+  .writing-scenario p { font-size: 15px; line-height: 1.6; }
+
+  .writing-fields { display: flex; flex-direction: column; gap: 12px; margin-bottom: 14px; }
+  .field-label { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: .07em; color: var(--muted); margin-bottom: 5px; }
+
+  .check-btn {
+    background: var(--ink); color: #fff; border: none;
+    border-radius: 10px; padding: 12px 26px;
+    font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700;
+    cursor: pointer; transition: all .2s; letter-spacing: .04em;
+  }
+  .check-btn:hover { background: #253547; transform: translateY(-1px); }
+  .check-btn.amber { background: var(--amber); color: var(--ink); }
+  .check-btn.amber:hover { background: #d4820a; }
+
+  .feedback-box {
+    margin-top: 14px; padding: 16px 18px;
+    border-radius: 12px; font-size: 14px; line-height: 1.7;
+    display: none;
+  }
+  .feedback-box.show { display: block; animation: appear .3s ease both; }
+  .feedback-box.good { background: var(--teal-light); color: #075A4E; border-left: 4px solid var(--teal); }
+  .feedback-box.warn { background: var(--amber-light); color: #8B5700; border-left: 4px solid var(--amber); }
+  .feedback-box.bad { background: var(--rose-light); color: var(--rose); border-left: 4px solid var(--rose); }
+
+  /* ─── FOOTER NAV ─── */
+  .fnav {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 48px; padding-top: 24px;
+    border-top: 1.5px solid var(--border);
+  }
+  .fnav-btn {
+    background: var(--ink); color: #fff; border: none;
+    border-radius: 10px; padding: 12px 26px;
+    font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700;
+    cursor: pointer; transition: all .2s; letter-spacing: .04em;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .fnav-btn:hover { background: #253547; transform: translateY(-1px); }
+  .fnav-btn:disabled { opacity: .25; pointer-events: none; }
+  .fnav-counter { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); }
+
+  /* score */
+  .score-reveal {
+    background: var(--ink); color: #fff; border-radius: 16px;
+    padding: 24px 28px; display: none; margin-top: 24px;
+    align-items: center; gap: 24px;
+  }
+  .score-reveal.show { display: flex; animation: appear .4s ease both; }
+  .score-circle {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: var(--amber); color: var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800;
+    flex-shrink: 0;
+  }
+  .score-reveal p { font-size: 15px; color: rgba(255,255,255,.8); }
+  .score-reveal strong { color: var(--amber); }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-noise"></div>
+  <div class="hero-accent"></div>
+  <div class="hero-accent2"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="hero-label">Class Preparation · B1-1 · Centro Colombo Americano</div>
+      <h1>Offering &<br><em>Accepting</em> Help</h1>
+      <p class="hero-desc">Real-World English for workplace situations. Learn when to use complex vs. simple expressions — and why <em>tone</em> matters more than words.</p>
+    </div>
+    <div class="hero-badge">
+      <span class="big-emoji">🤝</span>
+      <p>Real-World<br>English</p>
+    </div>
+  </div>
+</header>
+
+<!-- PROGRESS -->
+<nav class="progress-strip">
+  <div class="progress-inner">
+    <button class="prog-step active" onclick="goTo(0)">01 · Warm-Up</button>
+    <button class="prog-step" onclick="goTo(1)">02 · Listening</button>
+    <button class="prog-step" onclick="goTo(2)">03 · Grammar Chart</button>
+    <button class="prog-step" onclick="goTo(3)">04 · Practice</button>
+    <button class="prog-step" onclick="goTo(4)">05 · Sort It Out</button>
+    <button class="prog-step" onclick="goTo(5)">06 · Write & Speak</button>
+  </div>
+</nav>
+
+<main>
+
+<!-- ═══════ 0. WARM-UP ═══════ -->
+<section id="sec-0" class="visible">
+  <div class="sec-title">
+    <span class="sec-tag" style="background:var(--amber-light);color:#8B5700">Warm-Up</span>
+    <h2>Before We Start</h2>
+  </div>
+
+  <div class="theory">
+    <h3>REAL-WORLD ENGLISH · Key Concept</h3>
+    <p>The way you <em>accept or reject an offer</em> often depends on two things: the <em>difficulty of the task</em> and your <em>relationship to the person</em>.</p>
+    <div class="rule">📌 <strong>Accept (difficult / stranger)</strong> → Use longer, more complex expressions. They show gratitude.<br><br>📌 <strong>Accept (simple / someone you know)</strong> → Shorter expressions are common and natural.<br><br>📌 <strong>Reject</strong> → Length also shows politeness, BUT pay attention to <em>tone</em>. A serious tone = genuine refusal, even if the words are polite.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🤔 THINK ABOUT IT — Quick Reflection</div>
+    <p style="font-size:15px;margin-bottom:18px;line-height:1.7">Imagine a stranger at the airport offers to help you carry your heavy suitcase. Would you say the same thing as if your best friend offered? Think about what you would say in each situation:</p>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.07em;color:var(--muted);margin-bottom:6px">SITUATION A — A stranger offers to help you:</div>
+        <input class="task-input" placeholder="I would say: ..." />
+      </div>
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.07em;color:var(--muted);margin-bottom:6px">SITUATION B — Your close friend offers to help you:</div>
+        <input class="task-input" placeholder="I would say: ..." />
+      </div>
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.07em;color:var(--muted);margin-bottom:6px">Why are your answers different? (write in English or Spanish)</div>
+        <textarea class="task-input" rows="2" style="resize:vertical" placeholder="Because..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="fnav">
+    <button class="fnav-btn" disabled>← Back</button>
+    <span class="fnav-counter">01 / 06</span>
+    <button class="fnav-btn" onclick="goTo(1)">Listening →</button>
+  </div>
+</section>
+
+<!-- ═══════ 1. LISTENING ═══════ -->
+<section id="sec-1">
+  <div class="sec-title">
+    <span class="sec-tag" style="background:var(--ink);color:var(--amber)">Listening</span>
+    <h2>Real Dialogues</h2>
+  </div>
+
+  <!-- PLAYER 1 -->
+  <div class="audio-player" id="player1">
+    <div class="player-header">
+      <div class="dialogue-info">
+        <h3>Dialogue 1 — The Office Deadline 🏢</h3>
+        <p>A manager offers help to an overwhelmed employee</p>
+      </div>
+      <div class="dialogue-parts">
+        <button class="part-btn active" onclick="switchDialogue(1)" id="d1btn">▶ Play</button>
+      </div>
+    </div>
+    <div class="play-area">
+      <button class="play-btn" id="playBtn1" onclick="togglePlay(1)">▶</button>
+      <div class="progress-track" onclick="seekAudio(event,1)">
+        <div class="progress-fill" id="prog1"></div>
+      </div>
+      <span class="time-label" id="time1">0:00</span>
+    </div>
+    <div class="speed-controls">
+      <span style="font-size:11px;color:rgba(255,255,255,.4);font-family:'JetBrains Mono',monospace;margin-right:4px">SPEED:</span>
+      <button class="speed-btn active" onclick="setSpeed(1,0.75,this)">0.75×</button>
+      <button class="speed-btn" onclick="setSpeed(1,1,this)">1×</button>
+      <button class="speed-btn" onclick="setSpeed(1,1.25,this)">1.25×</button>
+    </div>
+  </div>
+
+  <div style="margin-bottom:14px">
+    <button class="transcript-toggle" onclick="toggleTranscript('t1')">📄 Show / Hide Transcript</button>
+  </div>
+  <div class="transcript" id="t1">
+    <div class="line"><span class="speaker-tag sp-a">MANAGER</span><div class="line-text">Good afternoon! Welcome to Hotel Mirador. <span class="highlight">Can I help you with your luggage?</span> Those bags look quite heavy!</div></div>
+    <div class="line"><span class="speaker-tag sp-b">EMPLOYEE</span><div class="line-text"><span class="highlight">That would be wonderful, thank you so much!</span> I've been travelling all day and I'm absolutely exhausted.</div></div>
+    <div class="line"><span class="speaker-tag sp-a">MANAGER</span><div class="line-text">Of course! Let me take those for you. <span class="highlight">Would you like me to show you to your room?</span></div></div>
+    <div class="line"><span class="speaker-tag sp-b">EMPLOYEE</span><div class="line-text"><span class="highlight">I'd really appreciate that,</span> thank you. This is my first time in this city!</div></div>
+    <div class="line"><span class="speaker-tag sp-a">MANAGER</span><div class="line-text"><span class="highlight">Would you also like me to format the presentation slides for the meeting tomorrow?</span></div></div>
+    <div class="line"><span class="speaker-tag sp-b">EMPLOYEE</span><div class="line-text"><span class="highlight">No thanks, I'm good!</span> I already looked everything up online. But thank you anyway!</div></div>
+    <div style="margin-top:14px;padding:12px 16px;background:var(--amber-light);border-radius:10px;font-size:13px;color:#8B5700">
+      🔍 Notice: The tourist uses a <strong>complex expression</strong> when the receptionist (stranger) offers to help with heavy bags — but a <strong>short expression</strong> to refuse the map (a simpler offer).
+    </div>
+  </div>
+
+  <!-- PLAYER 2 -->
+  <div class="audio-player" id="player2" style="margin-top:24px">
+    <div class="player-header">
+      <div class="dialogue-info">
+        <h3>Dialogue 2 — The Coffee Break ☕</h3>
+        <p>A coworker offers a small favor to a colleague</p>
+      </div>
+    </div>
+    <div class="play-area">
+      <button class="play-btn" id="playBtn2" onclick="togglePlay(2)">▶</button>
+      <div class="progress-track" onclick="seekAudio(event,2)">
+        <div class="progress-fill" id="prog2"></div>
+      </div>
+      <span class="time-label" id="time2">0:00</span>
+    </div>
+    <div class="speed-controls">
+      <span style="font-size:11px;color:rgba(255,255,255,.4);font-family:'JetBrains Mono',monospace;margin-right:4px">SPEED:</span>
+      <button class="speed-btn active" onclick="setSpeed(2,0.75,this)">0.75×</button>
+      <button class="speed-btn" onclick="setSpeed(2,1,this)">1×</button>
+      <button class="speed-btn" onclick="setSpeed(2,1.25,this)">1.25×</button>
+    </div>
+  </div>
+
+  <div style="margin-bottom:14px;margin-top:14px">
+    <button class="transcript-toggle" onclick="toggleTranscript('t2')">📄 Show / Hide Transcript</button>
+  </div>
+  <div class="transcript" id="t2">
+    <div class="line"><span class="speaker-tag sp-a">COWORKER</span><div class="line-text">Hey, are you keeping up okay? <span class="highlight">Do you want me to carry your camera bag for a bit?</span> The path gets steeper ahead.</div></div>
+    <div class="line"><span class="speaker-tag sp-b">EMPLOYEE</span><div class="line-text"><span class="highlight">It's okay, I've got it — but thank you!</span> I'm used to hiking with heavy gear.</div></div>
+    <div class="line"><span class="speaker-tag sp-a">COWORKER</span><div class="line-text">No problem! <span class="highlight">Would you like me to take a photo of you at the lookout point?</span></div></div>
+    <div class="line"><span class="speaker-tag sp-b">EMPLOYEE</span><div class="line-text"><span class="highlight">Oh, that would be absolutely lovely!</span> I never have any good photos of myself. <span class="highlight">I'd really appreciate it!</span></div></div>
+    <div class="line"><span class="speaker-tag sp-a">COWORKER</span><div class="line-text">Great! <span class="highlight">Shall I also send the photo to your email?</span></div></div>
+    <div class="line"><span class="speaker-tag sp-b">EMPLOYEE</span><div class="line-text"><span class="highlight">Thank you so much, but I think I can manage — I'll just do it when I review them!</span></div></div>
+    <div style="margin-top:14px;padding:12px 16px;background:var(--teal-light);border-radius:10px;font-size:13px;color:#075A4E">
+      🔍 Notice: The tourist uses a <strong>short rejection</strong> for a simple offer (camera bag), but a <strong>complex acceptance</strong> for something more meaningful (the photo). The <strong>polite refusal</strong> at the end is long — showing respect.
+    </div>
+  </div>
+
+  <!-- TASKS -->
+  <div class="card" style="margin-top:24px">
+    <div class="card-title">✏️ LISTENING TASK — Answer the questions</div>
+    <div class="task-box" style="border:none;padding:0;background:transparent;margin-bottom:14px">
+      <div class="task-label">Question 1</div>
+      <p>In Dialogue 1, the tourist accepts the first two offers. What expressions does she use?</p>
+      <input class="task-input" placeholder="She says: ..." />
+    </div>
+    <div class="task-box" style="border:none;padding:0;background:transparent;margin-bottom:14px">
+      <div class="task-label">Question 2</div>
+      <p>In Dialogue 1, what does the tourist reject? What does she say?</p>
+      <input class="task-input" placeholder="She rejects the offer of... She says: ..." />
+    </div>
+    <div class="task-box" style="border:none;padding:0;background:transparent;margin-bottom:14px">
+      <div class="task-label">Question 3</div>
+      <p>In Dialogue 2, why does the tourist use a short expression to reject the camera bag offer?</p>
+      <textarea class="task-input" rows="2" style="resize:vertical" placeholder="Because..."></textarea>
+    </div>
+    <div class="task-box" style="border:none;padding:0;background:transparent">
+      <div class="task-label">Question 4 — Reflection</div>
+      <p>Find one example of a <strong>tone-dependent</strong> refusal in the dialogues. How do you think it sounds?</p>
+      <input class="task-input" placeholder="The expression is... I think it sounds..." />
+    </div>
+  </div>
+
+  <div class="fnav">
+    <button class="fnav-btn" onclick="goTo(0)">← Warm-Up</button>
+    <span class="fnav-counter">02 / 06</span>
+    <button class="fnav-btn" onclick="goTo(2)">Grammar →</button>
+  </div>
+</section>
+
+<!-- ═══════ 2. GRAMMAR CHART ═══════ -->
+<section id="sec-2">
+  <div class="sec-title">
+    <span class="sec-tag" style="background:var(--teal-light);color:#075A4E">Grammar Chart</span>
+    <h2>Expressions to Use</h2>
+  </div>
+
+  <div class="theory">
+    <h3>THE RULE — Length + Tone</h3>
+    <p>Choosing the right expression depends on <em>three factors</em>: the difficulty of the task, your relationship to the speaker, and your tone.</p>
+    <div class="rule">✅ <strong>Accepting</strong>: Longer = more grateful (use for difficult tasks / strangers). Shorter = casual (use for easy tasks / friends).<br><br>❌ <strong>Rejecting</strong>: Length also signals politeness, but even a long expression CAN sound like a genuine refusal if said with a <em>serious tone</em>.</div>
+  </div>
+
+  <p style="font-size:14px;color:var(--muted);margin-bottom:16px;font-family:'Syne',sans-serif;font-weight:600;letter-spacing:.06em">👆 CLICK ANY EXPRESSION TO MARK IT AS PRACTICED</p>
+
+  <div class="chart-wrap">
+    <!-- ACCEPT column -->
+    <div class="chart-col">
+      <div class="chart-header accept">✅ ACCEPTING OFFERS</div>
+      <div class="chart-subgroup">
+        <div class="chart-sub-label formal">FORMAL / COMPLEX — Difficult task or stranger</div>
+        <ul class="expr-list accept-formal">
+          <li class="expr-item" onclick="markExpr(this)"><span class="dot"></span>That would be wonderful, thank you so much!</li>
+          <li class="expr-item" onclick="markExpr(this)"><span class="dot"></span>I'd really appreciate your help with that.</li>
+          <li class="expr-item" onclick="markExpr(this)"><span class="dot"></span>That's very kind of you, I'd love that!</li>
+          <li class="expr-item" onclick="markExpr(this)"><span class="dot"></span>Oh, how thoughtful! Yes please.</li>
+          <li class="expr-item" onclick="markExpr(this)"><span class="dot"></span>I'm so grateful for your offer.</li>
+        </ul>
+      </div>
+      <div class="chart-subgroup">
+        <div class="chart-sub-label informal">INFORMAL / SHORT — Easy task or someone you know</div>
+        <ul class="expr-list accept-informal">
+          <li class="expr-item" onclick="markExpr(this)"><span class="dot"></span>Sure, thanks!</li>
+          <li class="expr-item" onclick="markExpr(this)"><span class="dot"></span>Yeah, go ahead!</li>
+          <li class="expr-item" onclick="markExpr(this)"><span class="dot"></span>OK, why not!</li>
+          <li class="expr-item" onclick="markExpr(this)"><span class="dot"></span>Sounds good!</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- REJECT column -->
+    <div class="chart-col">
+      <div class="chart-header reject">❌ REJECTING OFFERS</div>
+      <div class="chart-subgroup">
+        <div class="chart-sub-label rformal">FORMAL / POLITE — Longer = more polite</div>
+        <ul class="expr-list reject-formal">
+          <li class="expr-item" onclick="markExpr(this)"><span class="dot"></span>Thank you so much, but I think I can manage.</li>
+          <li class="expr-item" onclick="markExpr(this)"><span class="dot"></span>That's very thoughtful, but I'll be fine.</li>
+          <li class="expr-item" onclick="markExpr(this)"><span class="dot"></span>I appreciate the offer, but I'd rather do it myself.</li>
+          <li class="expr-item" onclick="markExpr(this)"><span class="dot"></span>You're very kind, but I've got it covered.</li>
+        </ul>
+      </div>
+      <div class="chart-subgroup">
+        <div class="chart-sub-label rinformal">INFORMAL / DIRECT — Tone matters!</div>
+        <ul class="expr-list reject-informal">
+          <li class="expr-item" onclick="markExpr(this)"><span class="dot"></span>No thanks, I'm good.</li>
+          <li class="expr-item" onclick="markExpr(this)"><span class="dot"></span>It's okay, I've got it.</li>
+          <li class="expr-item" onclick="markExpr(this)"><span class="dot"></span>Thanks, but no need.</li>
+          <li class="expr-item" onclick="markExpr(this)"><span class="dot"></span>I'm fine, really!</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="background:var(--amber-light);border-color:rgba(232,146,10,.3)">
+    <div class="card-title" style="color:#8B5700">⚠️ TONE ALERT</div>
+    <p style="font-size:15px;line-height:1.7;color:#5C3A00">Even a polite expression like <strong>"Thank you so much, but I think I can manage"</strong> can sound like a <strong>genuine, firm refusal</strong> if said with a very serious or cold tone. Tone communicates what words alone cannot. Practice saying expressions with different tones!</p>
+  </div>
+
+  <div class="fnav">
+    <button class="fnav-btn" onclick="goTo(1)">← Listening</button>
+    <span class="fnav-counter">03 / 06</span>
+    <button class="fnav-btn" onclick="goTo(3)">Practice →</button>
+  </div>
+</section>
+
+<!-- ═══════ 3. PRACTICE QUIZ ═══════ -->
+<section id="sec-3">
+  <div class="sec-title">
+    <span class="sec-tag" style="background:var(--ink);color:#fff">Practice</span>
+    <h2>Choose the Best Response</h2>
+  </div>
+
+  <div id="quizWrap"></div>
+  <div class="score-reveal" id="scoreReveal">
+    <div class="score-circle" id="scoreNum">0/5</div>
+    <p id="scoreText">Complete all questions to see your score!</p>
+  </div>
+
+  <div class="fnav">
+    <button class="fnav-btn" onclick="goTo(2)">← Grammar</button>
+    <span class="fnav-counter">04 / 06</span>
+    <button class="fnav-btn" onclick="goTo(4)">Sort It Out →</button>
+  </div>
+</section>
+
+<!-- ═══════ 4. SORT ACTIVITY ═══════ -->
+<section id="sec-4">
+  <div class="sec-title">
+    <span class="sec-tag" style="background:var(--teal-light);color:#075A4E">Sort It Out</span>
+    <h2>Accept or Reject?</h2>
+  </div>
+
+  <p style="font-size:15px;margin-bottom:20px;line-height:1.7">Click each expression to place it in the correct category below — <strong>Accepting</strong> or <strong>Rejecting</strong>.</p>
+
+  <div class="card">
+    <div class="card-title">EXPRESSION BANK — Click to sort 👇</div>
+    <div class="sort-items" id="sortBank">
+    </div>
+  </div>
+
+  <div class="sort-wrap">
+    <div class="sort-bank">
+      <h4 style="color:var(--teal)">✅ ACCEPTING</h4>
+      <div class="sort-zone" id="zone-accept" onclick="dropToZone('accept')">
+        <span style="font-size:12px;color:var(--muted);font-family:'Syne',sans-serif">Click an expression above, then click here</span>
+      </div>
+    </div>
+    <div class="sort-bank">
+      <h4 style="color:var(--rose)">❌ REJECTING</h4>
+      <div class="sort-zone" id="zone-reject" onclick="dropToZone('reject')">
+        <span style="font-size:12px;color:var(--muted);font-family:'Syne',sans-serif">Click an expression above, then click here</span>
+      </div>
+    </div>
+  </div>
+
+  <button class="check-btn amber" onclick="checkSort()" style="margin-bottom:14px">Check my answers ✓</button>
+  <div class="feedback-box" id="sortFeedback"></div>
+
+  <div class="fnav">
+    <button class="fnav-btn" onclick="goTo(3)">← Practice</button>
+    <span class="fnav-counter">05 / 06</span>
+    <button class="fnav-btn" onclick="goTo(5)">Write & Speak →</button>
+  </div>
+</section>
+
+<!-- ═══════ 5. WRITE & SPEAK ═══════ -->
+<section id="sec-5">
+  <div class="sec-title">
+    <span class="sec-tag" style="background:var(--rose-light);color:var(--rose)">Write & Speak</span>
+    <h2>Your Class Preparation</h2>
+  </div>
+
+  <p style="font-size:15px;margin-bottom:20px;line-height:1.7;color:var(--muted)">Read each workplace scenario and write the best expression to accept or reject the offer. Then practice saying it out loud!</p>
+
+  <!-- Scenario 1 -->
+  <div class="card" id="writCard1">
+    <div class="writing-scenario">
+      <div class="scenario-label">📍 SCENARIO 1 — Important Project / Formal</div>
+      <p>A senior executive offers to review your project proposal before you submit it. You are nervous and this would be really helpful.</p>
+    </div>
+    <div class="writing-fields">
+      <div>
+        <div class="field-label">YOUR EXPRESSION (accepting — formal)</div>
+        <input class="task-input" id="w1" placeholder="Write a full expression here..." />
+      </div>
+      <div>
+        <div class="field-label">WHY DID YOU CHOOSE THIS TYPE OF EXPRESSION?</div>
+        <input class="task-input" id="w1r" placeholder="I chose this because..." />
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <button class="check-btn" onclick="checkWrite(1)">Check ✓</button>
+      <button class="check-btn" style="background:var(--teal)" onclick="speakText(document.getElementById('w1').value)">🔊 Hear my answer</button>
+    </div>
+    <div class="feedback-box" id="wfb1"></div>
+  </div>
+
+  <!-- Scenario 2 -->
+  <div class="card" id="writCard2">
+    <div class="writing-scenario">
+      <div class="scenario-label">📍 SCENARIO 2 — Office Supply / Casual</div>
+      <p>Your desk mate offers to grab a notebook for you from the supply closet. It's a simple thing and you know them well.</p>
+    </div>
+    <div class="writing-fields">
+      <div>
+        <div class="field-label">YOUR EXPRESSION (accepting — informal)</div>
+        <input class="task-input" id="w2" placeholder="Write a short expression here..." />
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <button class="check-btn" onclick="checkWrite(2)">Check ✓</button>
+      <button class="check-btn" style="background:var(--teal)" onclick="speakText(document.getElementById('w2').value)">🔊 Hear my answer</button>
+    </div>
+    <div class="feedback-box" id="wfb2"></div>
+  </div>
+
+  <!-- Scenario 3 -->
+  <div class="card" id="writCard3">
+    <div class="writing-scenario">
+      <div class="scenario-label">📍 SCENARIO 3 — Commute / Polite Refusal</div>
+      <p>A coworker you don't know well offers to give you a ride home. You prefer to take the train and want to politely refuse without being rude.</p>
+    </div>
+    <div class="writing-fields">
+      <div>
+        <div class="field-label">YOUR EXPRESSION (rejecting — polite)</div>
+        <input class="task-input" id="w3" placeholder="Write a polite refusal..." />
+      </div>
+      <div>
+        <div class="field-label">HOW WOULD YOU SAY THIS? (tone)</div>
+        <select class="task-input" id="w3t" style="cursor:pointer">
+          <option value="">— Select your tone —</option>
+          <option value="warm">Warm and friendly 😊</option>
+          <option value="neutral">Neutral and calm 😐</option>
+          <option value="serious">Serious and firm 😶</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <button class="check-btn" onclick="checkWrite(3)">Check ✓</button>
+      <button class="check-btn" style="background:var(--teal)" onclick="speakText(document.getElementById('w3').value)">🔊 Hear my answer</button>
+    </div>
+    <div class="feedback-box" id="wfb3"></div>
+  </div>
+
+  <!-- Scenario 4 -->
+  <div class="card" id="writCard4">
+    <div class="writing-scenario">
+      <div class="scenario-label">📍 SCENARIO 4 — Small Task / Direct Refusal</div>
+      <p>A coworker offers to organize your desk pens. You already like how they are and want to decline quickly.</p>
+    </div>
+    <div class="writing-fields">
+      <div>
+        <div class="field-label">YOUR EXPRESSION (rejecting — short/direct)</div>
+        <input class="task-input" id="w4" placeholder="Write a short refusal..." />
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <button class="check-btn" onclick="checkWrite(4)">Check ✓</button>
+      <button class="check-btn" style="background:var(--teal)" onclick="speakText(document.getElementById('w4').value)">🔊 Hear my answer</button>
+    </div>
+    <div class="feedback-box" id="wfb4"></div>
+  </div>
+
+  <div class="card" style="background:var(--ink);border-color:var(--ink)">
+    <div class="card-title" style="color:var(--amber)">🏆 CHALLENGE — Your Own Dialogue</div>
+    <p style="font-size:15px;line-height:1.7;color:rgba(255,255,255,.75);margin-bottom:16px">Write a short workplace dialogue (4–6 lines) that includes at least one <strong>acceptance</strong> and one <strong>rejection</strong>. Use expressions from the chart!</p>
+    <textarea id="myDialogue" style="width:100%;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);border-radius:10px;padding:14px 16px;color:#fff;font-family:'Lora',serif;font-size:14px;line-height:1.8;outline:none;resize:vertical;transition:border-color .2s" rows="7" placeholder="A: (offer)&#10;B: (accept/reject)&#10;A: (follow-up offer)&#10;B: (accept/reject)&#10;..."></textarea>
+    <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+      <button class="check-btn amber" onclick="checkDialogue()">Check my dialogue ✓</button>
+      <button class="check-btn" style="background:var(--teal)" onclick="speakText(document.getElementById('myDialogue').value)">🔊 Listen to my dialogue</button>
+    </div>
+    <div class="feedback-box" id="dialogueFb" style="margin-top:0"></div>
+  </div>
+
+  <div class="fnav">
+    <button class="fnav-btn" onclick="goTo(4)">← Sort It Out</button>
+    <span class="fnav-counter">06 / 06</span>
+    <button class="fnav-btn" disabled>Done! 🎉</button>
+  </div>
+</section>
+
+</main>
+
+<script>
+// ─── NAV ───
+let cur = 0;
+const secs = document.querySelectorAll('section');
+const steps = document.querySelectorAll('.prog-step');
+
+function goTo(i) {
+  secs[cur].classList.remove('visible');
+  steps[cur].classList.remove('active');
+  if(cur < i) steps[cur].classList.add('done');
+  cur = i;
+  secs[cur].classList.add('visible');
+  steps[cur].classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ─── MARK EXPRESSIONS ───
+function markExpr(el) {
+  el.classList.toggle('used');
+  el.style.animation='none';
+  setTimeout(()=>el.style.animation='',10);
+}
+
+// ─── SPEECH SYNTHESIS (LISTENING) ───
+const dialogues = {
+  1: [
+    {voice:'en-US',text:"Hi Sarah! You look really stressed. Can I help you with that quarterly report? It looks like a lot of work!"},
+    {voice:'en-GB',text:"That would be wonderful, thank you so much! I've been working on it all morning and I'm absolutely exhausted."},
+    {voice:'en-US',text:"Of course! Let me take a section. Would you like me to analyze the financial data for you?"},
+    {voice:'en-GB',text:"I'd really appreciate that, thank you. This is my first time doing this report!"},
+    {voice:'en-US',text:"Would you also like me to format the presentation slides for the meeting tomorrow?"},
+    {voice:'en-GB',text:"No thanks, I'm good! I already set up the template. But thank you anyway!"},
+  ],
+  2: [
+    {voice:'en-US',text:"Hey, you've been staring at that screen for hours. Do you want me to grab you a coffee from the breakroom?"},
+    {voice:'en-GB',text:"It's okay, I've got it — but thank you! I just had a cup an hour ago."},
+    {voice:'en-US',text:"No problem! Would you like me to print those documents for you on my way back?"},
+    {voice:'en-GB',text:"Oh, that would be absolutely lovely! My printer is completely jammed. I'd really appreciate it!"},
+    {voice:'en-US',text:"Great! Shall I also staple them for you?"},
+    {voice:'en-GB',text:"Thank you so much, but I think I can manage — I'll just do it when I review them!"},
+  ]
+};
+
+let utterances = {};
+let playStates = {1:false,2:false};
+let rates = {1:0.75,2:0.75};
+let intervals = {};
+let durEstimates = {1:0,2:0};
+let elapsed = {1:0,2:0};
+let lineIdx = {1:0,2:0};
+
+function togglePlay(n) {
+  if(playStates[n]) {
+    stopPlay(n);
+  } else {
+    startPlay(n);
+  }
+}
+
+function startPlay(n) {
+  if(window.speechSynthesis.speaking) window.speechSynthesis.cancel();
+  stopPlay(n);
+  playStates[n] = true;
+  const btn = document.getElementById(`playBtn${n}`);
+  btn.textContent = '⏸';
+  btn.classList.add('playing');
+  lineIdx[n] = 0;
+  elapsed[n] = 0;
+  speakLine(n);
+}
+
+function speakLine(n) {
+  if(lineIdx[n] >= dialogues[n].length) {
+    stopPlay(n);
+    document.getElementById(`prog${n}`).style.width = '100%';
+    return;
+  }
+  const line = dialogues[n][lineIdx[n]];
+  const utt = new SpeechSynthesisUtterance(line.text);
+  utt.rate = rates[n];
+  utt.lang = line.voice;
+  utt.pitch = line.voice === 'en-GB' ? 1.1 : 0.95;
+
+  const voices = window.speechSynthesis.getVoices();
+  const match = voices.find(v => v.lang.startsWith(line.voice.substring(0,2)) && v.lang.includes(line.voice.substring(3)));
+  if(match) utt.voice = match;
+
+  const totalLines = dialogues[n].length;
+  utt.onstart = () => {
+    const pct = (lineIdx[n] / totalLines) * 100;
+    document.getElementById(`prog${n}`).style.width = pct + '%';
+  };
+  utt.onend = () => {
+    lineIdx[n]++;
+    const pct = (lineIdx[n] / totalLines) * 100;
+    document.getElementById(`prog${n}`).style.width = pct + '%';
+    if(playStates[n]) speakLine(n);
+  };
+  window.speechSynthesis.speak(utt);
+  updateTimer(n);
+}
+
+function stopPlay(n) {
+  window.speechSynthesis.cancel();
+  playStates[n] = false;
+  clearInterval(intervals[n]);
+  const btn = document.getElementById(`playBtn${n}`);
+  if(btn) { btn.textContent = '▶'; btn.classList.remove('playing'); }
+}
+
+function updateTimer(n) {
+  clearInterval(intervals[n]);
+  let s = 0;
+  intervals[n] = setInterval(() => {
+    s++;
+    const m = Math.floor(s/60);
+    document.getElementById(`time${n}`).textContent = m+':'+(s%60<10?'0':'')+(s%60);
+  }, 1000);
+}
+
+function setSpeed(n, rate, btn) {
+  rates[n] = rate;
+  document.querySelectorAll(`#player${n} .speed-btn`).forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function seekAudio(e, n) {
+  // Visual only feedback
+  const track = e.currentTarget;
+  const pct = e.offsetX / track.offsetWidth;
+  document.getElementById(`prog${n}`).style.width = (pct*100)+'%';
+}
+
+function toggleTranscript(id) {
+  const t = document.getElementById(id);
+  t.classList.toggle('show');
+}
+
+// ─── SPEAK TEXT ───
+function speakText(txt) {
+  if(!txt.trim()) { alert('Please write something first!'); return; }
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(txt);
+  utt.lang = 'en-US'; utt.rate = 0.9;
+  window.speechSynthesis.speak(utt);
+}
+
+// ─── QUIZ ───
+const quizItems = [
+  {
+    scenario: "🏨 A hotel manager (you don't know them) offers to personally upgrade your room for free.",
+    q: "What is the most appropriate response?",
+    opts: [
+      "Yeah, sure!",
+      "That would be absolutely wonderful, thank you so much!",
+      "No thanks.",
+      "OK whatever."
+    ],
+    correct: 1,
+    explain: "✅ Correct! When a stranger does something very kind and generous, a complex, grateful expression like 'That would be absolutely wonderful, thank you so much!' shows proper appreciation and politeness."
+  },
+  {
+    scenario: "🏖️ Your close friend offers to pass you the sunscreen.",
+    q: "Which expression fits best here?",
+    opts: [
+      "That's very kind of you, I would truly appreciate your generous assistance.",
+      "Sure, thanks!",
+      "I am most grateful for your thoughtful and generous offer.",
+      "Thank you so much, you are very kind."
+    ],
+    correct: 1,
+    explain: "✅ Correct! For a simple, easy task with someone you know well, short and casual is perfectly natural. 'Sure, thanks!' is warm and appropriate."
+  },
+  {
+    scenario: "🗺️ A tour guide offers to carry your heavy photography equipment. You don't need help.",
+    q: "How should you reject this offer politely?",
+    opts: [
+      "No.",
+      "No thanks, I'm good.",
+      "Thank you so much, but I think I can manage — I'm used to carrying my gear!",
+      "I don't need your help."
+    ],
+    correct: 2,
+    explain: "✅ Correct! When rejecting an offer from someone doing their job (a stranger), a longer, warmer expression is more polite and professional."
+  },
+  {
+    scenario: "🍽️ A waiter offers you a dessert menu. You're in a hurry and want to decline quickly.",
+    q: "Which is the most natural, direct refusal?",
+    opts: [
+      "Thank you so much, that is very thoughtful of you, but I'll be fine.",
+      "No.",
+      "No thanks, I'm fine!",
+      "I refuse your offer."
+    ],
+    correct: 2,
+    explain: "✅ Correct! 'No thanks, I'm fine!' is short, direct, and friendly — perfect for a simple, quick rejection in an informal service situation."
+  },
+  {
+    scenario: "✈️ Someone on a plane says 'I'd rather sit alone' with a very cold, serious voice, even though it's technically a polite phrase.",
+    q: "What does this tell us about offers and refusals?",
+    opts: [
+      "Long expressions are always polite.",
+      "Short expressions are always rude.",
+      "Tone can change the meaning of an expression — a serious tone makes even polite words feel like a firm refusal.",
+      "It doesn't matter how you say something."
+    ],
+    correct: 2,
+    explain: "✅ Exactly! This is the key insight: tone matters just as much as the words. A serious or cold tone can turn a polite expression into a very firm, genuine refusal."
+  }
+];
+
+let qAnswered = new Array(quizItems.length).fill(false);
+let qScore = 0;
+
+function buildQuiz() {
+  const wrap = document.getElementById('quizWrap');
+  quizItems.forEach((q, i) => {
+    const div = document.createElement('div');
+    div.className = 'quiz-item';
+    div.id = `qi-${i}`;
+    div.innerHTML = `
+      <div class="quiz-scenario">${q.scenario}</div>
+      <div class="quiz-q">${q.q}</div>
+      <div class="quiz-opts" id="qo-${i}">
+        ${q.opts.map((o,j)=>`<button class="quiz-opt" onclick="answerQuiz(${i},${j})">${o}</button>`).join('')}
+      </div>
+      <div class="quiz-explain" id="qe-${i}"></div>
+    `;
+    wrap.appendChild(div);
+  });
+}
+buildQuiz();
+
+function answerQuiz(qi, oi) {
+  if(qAnswered[qi]) return;
+  qAnswered[qi] = true;
+  const q = quizItems[qi];
+  const isOk = oi === q.correct;
+  if(isOk) qScore++;
+  const box = document.getElementById(`qi-${qi}`);
+  const opts = document.querySelectorAll(`#qo-${qi} .quiz-opt`);
+  opts.forEach((b,j) => {
+    b.disabled = true;
+    if(j===q.correct) b.classList.add('correct-ans');
+  });
+  opts[oi].classList.add(isOk ? 'correct-ans' : 'wrong-ans');
+  box.classList.add(isOk ? 'correct' : 'wrong');
+  const expl = document.getElementById(`qe-${qi}`);
+  expl.classList.add('show', isOk ? 'ok' : 'bad');
+  expl.innerHTML = isOk ? q.explain : `❌ Not quite. ${q.explain}`;
+  if(qAnswered.every(Boolean)) {
+    const rev = document.getElementById('scoreReveal');
+    rev.classList.add('show');
+    document.getElementById('scoreNum').textContent = `${qScore}/${quizItems.length}`;
+    const msgs = ['Keep reviewing the chart!', 'Good effort — review tone!', 'Getting there!', 'Nice work!', 'Excellent! You\'re ready!'];
+    document.getElementById('scoreText').innerHTML = `<strong>${msgs[qScore-1]||msgs[0]}</strong> You got ${qScore} out of ${quizItems.length} correct.`;
+  }
+}
+
+// ─── SORT ───
+const sortExpressions = [
+  {text:"Sure, thanks!", type:"accept"},
+  {text:"That's very kind of you, I'd love that!", type:"accept"},
+  {text:"No thanks, I'm good.", type:"reject"},
+  {text:"Thank you so much, but I think I can manage.", type:"reject"},
+  {text:"I'd really appreciate your help.", type:"accept"},
+  {text:"It's okay, I've got it.", type:"reject"},
+  {text:"Yeah, go ahead!", type:"accept"},
+  {text:"That's thoughtful, but I'll be fine.", type:"reject"},
+];
+
+let selectedChip = null;
+let sortResults = {};
+
+function buildSort() {
+  const bank = document.getElementById('sortBank');
+  const shuffled = [...sortExpressions].sort(()=>Math.random()-.5);
+  shuffled.forEach((e,i) => {
+    const chip = document.createElement('div');
+    chip.className = 'sort-chip';
+    chip.id = `chip-${i}`;
+    chip.dataset.type = e.type;
+    chip.dataset.idx = i;
+    chip.textContent = e.text;
+    chip.onclick = () => selectChip(chip);
+    bank.appendChild(chip);
+  });
+}
+buildSort();
+
+function selectChip(el) {
+  if(el.classList.contains('placed')) return;
+  document.querySelectorAll('.sort-chip').forEach(c=>c.style.outline='');
+  if(selectedChip === el) { selectedChip = null; return; }
+  selectedChip = el;
+  el.style.outline = '2px solid var(--amber)';
+}
+
+function dropToZone(zone) {
+  if(!selectedChip) return;
+  const idx = selectedChip.dataset.idx;
+  const type = selectedChip.dataset.type;
+  sortResults[idx] = zone;
+  selectedChip.classList.add('placed');
+  selectedChip.style.outline = '';
+
+  const zoneEl = document.getElementById(`zone-${zone}`);
+  // remove placeholder
+  const placeholder = zoneEl.querySelector('span');
+  if(placeholder) placeholder.remove();
+
+  const placed = document.createElement('div');
+  placed.className = `sort-placed ${zone}-placed`;
+  placed.innerHTML = `${selectedChip.textContent} <button class="remove-btn" onclick="removeFromZone('${idx}','${zone}',this.parentElement)">✕</button>`;
+  zoneEl.appendChild(placed);
+  selectedChip = null;
+}
+
+function removeFromZone(idx, zone, el) {
+  delete sortResults[idx];
+  el.remove();
+  const chip = document.getElementById(`chip-${idx}`);
+  chip.classList.remove('placed');
+  const zoneEl = document.getElementById(`zone-${zone}`);
+  if(!zoneEl.querySelector('.sort-placed') && !zoneEl.querySelector('span')) {
+    zoneEl.innerHTML = '<span style="font-size:12px;color:var(--muted);font-family:\'Syne\',sans-serif">Click an expression above, then click here</span>';
+  }
+}
+
+function checkSort() {
+  const fb = document.getElementById('sortFeedback');
+  const total = sortExpressions.length;
+  const answered = Object.keys(sortResults).length;
+  if(answered < total) {
+    fb.className = 'feedback-box show warn';
+    fb.textContent = `⚠️ Please sort all ${total} expressions first! You've placed ${answered} so far.`;
+    return;
+  }
+  let correct = 0;
+  sortExpressions.forEach((e,i) => {
+    if(sortResults[i] === e.type) correct++;
+  });
+  fb.classList.add('show');
+  if(correct === total) {
+    fb.className = 'feedback-box show good';
+    fb.textContent = `🏆 Perfect! All ${total} expressions sorted correctly. You clearly understand the difference between accepting and rejecting offers!`;
+  } else {
+    fb.className = 'feedback-box show warn';
+    fb.textContent = `📊 ${correct} out of ${total} correct. Some expressions might have surprised you — remember: expressions like "That's very kind of you" and "I'd really appreciate it" are always ACCEPTING. Go back to the chart if needed!`;
+  }
+}
+
+// ─── WRITING CHECKS ───
+const acceptKeywords = ['wonderful','appreciate','love that','kind','grateful','sure','okay','go ahead','sounds good','yes please','lovely','great'];
+const rejectKeywords = ['manage','fine','got it','no thanks','no need','rather','okay without','politely','thanks but'];
+
+function checkWrite(n) {
+  const val = document.getElementById(`w${n}`).value.trim().toLowerCase();
+  const fb = document.getElementById(`wfb${n}`);
+  if(!val) { fb.className='feedback-box show warn'; fb.textContent='Please write an expression first!'; return; }
+  
+  const isAccept = n===1||n===2;
+  const keywords = isAccept ? acceptKeywords : rejectKeywords;
+  const hasKeyword = keywords.some(k => val.includes(k));
+  const isLong = val.length > 30;
+  const isShort = val.length <= 30;
+
+  if(n===1) {
+    if(hasKeyword && isLong) { fb.className='feedback-box show good'; fb.textContent='✅ Great! You used a complex, polite expression — perfect for a stranger offering help with something important. Well done!'; }
+    else if(hasKeyword) { fb.className='feedback-box show warn'; fb.textContent='🟡 Good start! Your expression has the right idea, but try to make it longer and more formal since this is a stranger helping you with something difficult.'; }
+    else { fb.className='feedback-box show bad'; fb.textContent='❌ Hmm, this doesn\'t quite sound like a formal acceptance. Try something like: "That would be wonderful, thank you so much!"'; }
+  } else if(n===2) {
+    if(hasKeyword && isShort) { fb.className='feedback-box show good'; fb.textContent='✅ Perfect! Short and casual — exactly right for a simple offer from someone you know.'; }
+    else if(isLong) { fb.className='feedback-box show warn'; fb.textContent='🟡 Your answer works, but it\'s a bit long for a casual situation with a friend. Try something shorter like "Sure, thanks!" or "Yeah, go ahead!"'; }
+    else { fb.className='feedback-box show warn'; fb.textContent='🟡 Almost! Make sure it sounds casual and friendly.'; }
+  } else if(n===3) {
+    const tone = document.getElementById('w3t').value;
+    if(hasKeyword && isLong && tone==='warm') { fb.className='feedback-box show good'; fb.textContent='✅ Excellent! A polite, longer expression said with a warm tone — that\'s the ideal way to refuse without offending someone.'; }
+    else if(hasKeyword && tone==='serious') { fb.className='feedback-box show warn'; fb.textContent='⚠️ Your words are polite, but you chose a "serious" tone — remember, this could make it sound like a firm, genuine refusal. Is that what you intend?'; }
+    else if(!hasKeyword) { fb.className='feedback-box show bad'; fb.textContent='❌ Try to include a thank you and a soft refusal. Example: "Thank you so much, but I think I can manage!"'; }
+    else { fb.className='feedback-box show warn'; fb.textContent='🟡 Good! Don\'t forget to also select your tone below.'; }
+  } else if(n===4) {
+    if(hasKeyword && isShort) { fb.className='feedback-box show good'; fb.textContent='✅ Perfect short refusal! Quick, friendly, and direct — ideal for a simple rejection.'; }
+    else if(isLong) { fb.className='feedback-box show warn'; fb.textContent='🟡 This works, but for a quick, simple refusal you can be shorter. Try: "No thanks, I\'m good!" or "It\'s okay, thanks!"'; }
+    else { fb.className='feedback-box show warn'; fb.textContent='🟡 Almost! Make it short and polite.'; }
+  }
+}
+
+function checkDialogue() {
+  const val = document.getElementById('myDialogue').value.trim();
+  const fb = document.getElementById('dialogueFb');
+  if(!val || val.split('\n').length < 3) { fb.className='feedback-box show warn'; fb.textContent='⚠️ Please write at least 4 lines for your dialogue first!'; return; }
+  const low = val.toLowerCase();
+  const hasAccept = acceptKeywords.some(k=>low.includes(k));
+  const hasReject = rejectKeywords.some(k=>low.includes(k));
+  if(hasAccept && hasReject) {
+    fb.className='feedback-box show good';
+    fb.textContent='🏆 Excellent! Your dialogue includes both an acceptance and a rejection — and it looks like you\'re using real expressions from the chart. You\'re ready for class!';
+  } else if(hasAccept) {
+    fb.className='feedback-box show warn';
+    fb.textContent='🟡 Good! Your dialogue has an acceptance, but try to also include a rejection. Use expressions like "No thanks, I\'m good" or "Thank you, but I think I can manage."';
+  } else if(hasReject) {
+    fb.className='feedback-box show warn';
+    fb.textContent='🟡 Good! Your dialogue has a rejection, but try to also include an acceptance. Use expressions like "That would be wonderful!" or "Sure, thanks!"';
+  } else {
+    fb.className='feedback-box show bad';
+    fb.textContent='❌ Your dialogue is missing clear acceptance and rejection expressions. Go back to the Grammar Chart and borrow some expressions!';
+  }
+}
+
+// Load voices
+window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+</script>
+</body>
+</html>
