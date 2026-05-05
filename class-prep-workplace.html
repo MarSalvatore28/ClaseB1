@@ -1383,6 +1383,23 @@ async function submitToTeacher() {
     return;
   }
   
+  // ANTI-TRAMPAS: Verificar que hayan llenado todo y no sea basura
+  const w1 = document.getElementById('w1') ? document.getElementById('w1').value.trim() : '';
+  const w2 = document.getElementById('w2') ? document.getElementById('w2').value.trim() : '';
+  const w3 = document.getElementById('w3') ? document.getElementById('w3').value.trim() : '';
+  const w4 = document.getElementById('w4') ? document.getElementById('w4').value.trim() : '';
+  const dialogue = document.getElementById('myDialogue') ? document.getElementById('myDialogue').value.trim() : '';
+  
+  if (!w1 || !w2 || !w3 || !w4 || !dialogue) {
+    alert("Hold on! You must complete ALL the Writing Scenarios and the Challenge Dialogue before submitting.");
+    return;
+  }
+  
+  if (w1.length < 5 || dialogue.length < 15) {
+    alert("Your answers are too short. Please write complete sentences and try again!");
+    return;
+  }
+  
   const btn = document.getElementById('submitBtn');
   btn.innerText = "Sending...";
   btn.disabled = true;

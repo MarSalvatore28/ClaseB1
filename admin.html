@@ -66,7 +66,7 @@
 </div>
 
 <div id="dashboard">
-  <h1>👩‍🏫 Panel de Resultados</h1>
+  <h1 id="panelTitle">👩‍🏫 Panel de Resultados</h1>
   <button class="btn" onclick="fetchData()" style="margin-bottom:30px;background:var(--teal);color:white">↻ Actualizar Respuestas</button>
   <div id="studentsContainer"></div>
 </div>
@@ -97,6 +97,8 @@
     
     const container = document.getElementById('studentsContainer');
     container.innerHTML = '';
+    
+    document.getElementById('panelTitle').innerHTML = `👩‍🏫 Panel de Resultados <span style="font-size:18px;color:var(--teal)">(${data.length} entregas)</span>`;
     
     if (data.length === 0) {
       container.innerHTML = '<p>Aún no hay respuestas de ningún estudiante.</p>';
