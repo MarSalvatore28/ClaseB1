@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard - Clase B1</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Lora:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0f1420;
+    --paper: #f5f0e8;
+    --amber: #E8920A;
+    --teal: #0D8C7A;
+    --white: #FEFDFB;
+  }
+  body {
+    font-family: 'Lora', Georgia, serif;
+    background: var(--paper);
+    color: var(--ink);
+    padding: 40px;
+    margin: 0;
+  }
+  h1 { font-family: 'Syne', sans-serif; font-size: 32px; color: var(--ink); margin-bottom: 30px; }
+  .login-box {
+    background: var(--white); border: 1.5px solid #DDD5C4;
+    border-radius: 16px; padding: 40px; max-width: 400px; margin: 50px auto;
+    text-align: center;
+  }
+  .login-box input {
+    width: 100%; padding: 12px; margin-bottom: 20px;
+    border: 1.5px solid #DDD5C4; border-radius: 8px; font-size: 16px;
+  }
+  .btn {
+    background: var(--amber); color: var(--ink); border: none;
+    border-radius: 10px; padding: 12px 26px;
+    font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700;
+    cursor: pointer;
+  }
+  .btn:hover { background: #d4820a; }
+  
+  #dashboard { display: none; }
+  
+  .student-card {
+    background: var(--white); border: 1.5px solid #DDD5C4;
+    border-radius: 16px; padding: 24px; margin-bottom: 20px;
+  }
+  .student-name {
+    font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 700;
+    color: var(--teal); margin-bottom: 5px;
+  }
+  .date { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #7f8c8d; margin-bottom: 20px; }
+  
+  .answer-block { margin-bottom: 15px; }
+  .answer-label { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; color: #8B5700; margin-bottom: 5px; text-transform: uppercase; }
+  .answer-text { background: rgba(0,0,0,0.03); padding: 12px; border-radius: 8px; font-size: 15px; line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<div id="loginView" class="login-box">
+  <h2 style="font-family:'Syne',sans-serif;margin-bottom:10px">Acceso Profesora</h2>
+  <p style="margin-bottom:20px;color:#7f8c8d">Ingresa tu contraseña para ver las respuestas de los estudiantes.</p>
+  <input type="password" id="pwdInput" placeholder="Contraseña..." />
+  <button class="btn" onclick="login()">Ingresar</button>
+  <p id="errorMsg" style="color:#C0392B;margin-top:15px;display:none;font-family:'Syne',sans-serif;font-weight:700">Contraseña incorrecta</p>
+</div>
+
+<div id="dashboard">
+  <h1>👩‍🏫 Panel de Resultados</h1>
+  <button class="btn" onclick="fetchData()" style="margin-bottom:30px;background:var(--teal);color:white">↻ Actualizar Respuestas</button>
+  <div id="studentsContainer"></div>
+</div>
+
+<script>
+  let currentPwd = '';
+
+  async function login() {
+    const pwd = document.getElementById('pwdInput').value;
+    try {
+      const res = await fetch(`/api/responses?pwd=${pwd}`);
+      if (res.ok) {
+        currentPwd = pwd;
+        document.getElementById('loginView').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+        fetchData();
+      } else {
+        document.getElementById('errorMsg').style.display = 'block';
+      }
+    } catch(e) {
+      alert("Error conectando con el servidor local");
+    }
+  }
+
+  async function fetchData() {
+    const res = await fetch(`/api/responses?pwd=${currentPwd}`);
+    const data = await res.json();
+    
+    const container = document.getElementById('studentsContainer');
+    container.innerHTML = '';
+    
+    if (data.length === 0) {
+      container.innerHTML = '<p>Aún no hay respuestas de ningún estudiante.</p>';
+      return;
+    }
+
+    // Mostrar las más recientes primero
+    data.reverse().forEach(student => {
+      const dateStr = new Date(student.timestamp).toLocaleString('es-CO');
+      
+      let html = `
+        <div class="student-card">
+          <div class="student-name">${student.name || 'Estudiante Sin Nombre'}</div>
+          <div class="date">Enviado: ${dateStr}</div>
+          
+          <div class="answer-block">
+            <div class="answer-label">Quiz Score</div>
+            <div class="answer-text"><strong>${student.quizScore || '0'}/5</strong></div>
+          </div>
+          
+          <div class="answer-block">
+            <div class="answer-label">Writing: Scenario 1 (Formal Accept)</div>
+            <div class="answer-text">${student.w1 || '<em>No respondió</em>'}<br><small style="color:#7f8c8d">Why: ${student.w1r || '-'}</small></div>
+          </div>
+          
+          <div class="answer-block">
+            <div class="answer-label">Writing: Scenario 2 (Casual Accept)</div>
+            <div class="answer-text">${student.w2 || '<em>No respondió</em>'}</div>
+          </div>
+          
+          <div class="answer-block">
+            <div class="answer-label">Writing: Scenario 3 (Polite Refusal)</div>
+            <div class="answer-text">${student.w3 || '<em>No respondió</em>'}<br><small style="color:#7f8c8d">Tone: ${student.w3t || '-'}</small></div>
+          </div>
+          
+          <div class="answer-block">
+            <div class="answer-label">Writing: Scenario 4 (Direct Refusal)</div>
+            <div class="answer-text">${student.w4 || '<em>No respondió</em>'}</div>
+          </div>
+          
+          <div class="answer-block">
+            <div class="answer-label">🏆 Challenge Dialogue</div>
+            <div class="answer-text" style="white-space:pre-wrap;font-family:'Lora',serif">${student.dialogue || '<em>No respondió</em>'}</div>
+          </div>
+        </div>
+      `;
+      container.innerHTML += html;
+    });
+  }
+</script>
+
+</body>
+</html>
